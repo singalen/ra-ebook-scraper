@@ -1,7 +1,5 @@
 # Copyright (c) 2012, Bin Tan
 # This file is distributed under the BSD Licence. See python-epub-builder-license.txt for details.
-import unicodedata
-
 from epubbuilder import epubbuilder
 from genshi.template import TemplateLoader
 import os
@@ -33,12 +31,9 @@ class Book:
 
     def __add_section(self, section, id, depth):
         if depth > 0:
-            stream = self.loader.load(section.templateFileName).generate(section = section)
-            html = stream.render('xhtml', doctype = 'xhtml11', drop_xml_decl = False)
-            try:
-                item = self.impl.add_html('%s.html' % id, html.decode('utf8'))
-            except UnicodeEncodeError as e:
-                item = self.impl.add_html('%s.html' % id, html.encode('utf8'))
+            stream = self.loader.load(section.templateFileName, encoding='utf8').generate(section = section)
+            html = stream.render('xhtml', doctype='xhtml11', drop_xml_decl=False, encoding='utf8')
+            item = self.impl.add_html('%s.html' % id, html.decode('utf8'))
             self.impl.add_spine_item(item)
             self.impl.add_toc_map_node(item.dest_path, section.title, parent=None)
             id += '.'
